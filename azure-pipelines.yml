@@ -6,11 +6,11 @@ pool:
 
 strategy:
   matrix:
-    Python310:
+    BillTest310:
       python.version: '3.10'
-    Python311:
+    BillTest311:
       python.version: '3.11'
-    Python312:
+    BillTest312:
       python.version: '3.12'
 
 steps:
