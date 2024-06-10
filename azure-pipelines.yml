@@ -6,8 +6,8 @@ pool:
 
 strategy:
   matrix:
-    BillTest311:
-      python.version: '3.11'
+    BillTest312:
+      python.version: '3.12'
 
 steps:
   - task: UsePythonVersion@0
