@@ -13,7 +13,9 @@ steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+      githubToken: '$(githubToken)'
     displayName: 'Use Python $(python.version)'
+    
 
   - script: |
       python -m pip install --upgrade pip
