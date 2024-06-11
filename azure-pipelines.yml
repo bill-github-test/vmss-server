@@ -2,10 +2,14 @@ trigger:
 - main
 
 pool:
-  name: Default
+  vmImage: ubuntu-latest
 
 strategy:
   matrix:
+    BillTest310:
+      python.version: '3.10'
+    BillTest311:
+      python.version: '3.11'
     BillTest312:
       python.version: '3.12'
 
@@ -13,9 +17,7 @@ steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
-      githubToken: '$(githubToken)'
     displayName: 'Use Python $(python.version)'
-    
 
   - script: |
       python -m pip install --upgrade pip
@@ -36,3 +38,8 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: 'drop'
       publishLocation: 'Container'
+
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'pytest'
