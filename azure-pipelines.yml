@@ -1,51 +1,38 @@
 variables:
-# Azure Resource Manager connection created during pipeline creation
-azureServiceConnectionId: 'BillTestServiceConnection'
-
-# Web app name
-webAppName: 'python-flask-test2'
-
-# Agent VM image name
-vmImageName: 'ubuntu-latest'
-
-# Environment name
-environmentName: 'python-flask-test2'
-
-# Project root folder.
-projectRoot: '$(System.DefaultWorkingDirectory)'
-
-# Python version: 3.11. Change this to match the Python runtime version running on your web app.
-pythonVersion: '3.11'
+  azureServiceConnectionId: 'BillTestServiceConnection'
+  webAppName: 'python-flask-test2'
+  vmImageName: 'ubuntu-latest'
+  environmentName: 'python-flask-test2'
+  projectRoot: $(System.DefaultWorkingDirectory)
+  pythonVersion: '3.11'
 
 jobs:
-    - job: BuildJob
-        pool:
-            vmImage: $(vmImageName)
-      
-steps:
-    - task: UsePythonVersion@0
-        inputs:
-            versionSpec: '$(pythonVersion)'
-            displayName: 'Use Python $(pythonVersion)'
-            
-    - script: |
-       python -m venv antenv
-       source antenv/bin/activate
-       python -m pip install --upgrade pip
-       pip install setup
-       pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
-     workingDirectory: $(projectRoot)
-     displayName: "Install requirements"
-     
-    - task: ArchiveFiles@2
-     displayName: 'Archive files'
-     inputs:
-       rootFolderOrFile: '$(projectRoot)'
-       includeRootFolder: false
-       archiveType: zip
-       archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-       replaceExistingArchive: true
-
-    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      displayName: 'Upload package'
-      artifact: drop
+- job: BuildJob
+  pool:
+    vmImage: $(vmImageName)
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
+  - script: |
+      python -m venv antenv
+      source antenv/bin/activate
+      python -m pip install --upgrade pip
+      pip install setup
+      pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
+    workingDirectory: $(projectRoot)
+    displayName: "Install requirements"
+  - task: ArchiveFiles@2
+    displayName: 'Archive files'
+    inputs:
+      rootFolderOrFile: '$(projectRoot)'
+      includeRootFolder: false
+      archiveType: zip
+      archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      replaceExistingArchive: true
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      ArtifactName: 'drop'
