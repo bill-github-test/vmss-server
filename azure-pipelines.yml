@@ -1,5 +1,5 @@
 variables:
-  azureServiceConnectionId: 'BillTestServiceConnection'
+  azureServiceConnectionId: 'BillTestServiceConnection-BillTestVmssServerProject'
   webAppName: 'BillTestVmssServer'
   vmImageName: 'ubuntu-latest'
   environmentName: 'BillTestVmssServer'
