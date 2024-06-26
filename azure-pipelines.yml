@@ -58,7 +58,7 @@ stages:
               versionSpec: '$(pythonVersion)'
             displayName: 'Use Python version'
           - task: AzureWebApp@1
-            displayName: 'Deploy Azure Web App: python-flask-test2'
+            displayName: 'Deploy Azure Web App: BillTestVmssServer'
             inputs:
               azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
