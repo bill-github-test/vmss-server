@@ -1,59 +1,65 @@
 variables:
   azureServiceConnectionId: 'BillTestServiceConnection'
-  webAppName: 'python-flask-test2'
+  webAppName: 'BillTestVmssServer'
   vmImageName: 'ubuntu-latest'
-  environmentName: 'python-flask-test2'
+  environmentName: 'BillTestVmssServer'
   projectRoot: $(System.DefaultWorkingDirectory)
-  pythonVersion: '3.11'
+  pythonVersion: '3.12' 
 
-jobs:
-- job: BuildJob
-  pool:
-    vmImage: $(vmImageName)
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(pythonVersion)'
-      displayName: 'Use Python $(pythonVersion)'
-  - script: |
-      python -m venv antenv
-      source antenv/bin/activate
-      python -m pip install --upgrade pip
-      pip install setup
-      pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
-    workingDirectory: $(projectRoot)
-    displayName: "Install requirements"
-  - task: ArchiveFiles@2
-    displayName: 'Archive files'
-    inputs:
-      rootFolderOrFile: '$(projectRoot)'
-      includeRootFolder: false
-      archiveType: zip
-      archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      replaceExistingArchive: true
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact'
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      ArtifactName: 'drop'
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        displayName: 'Use Python $(pythonVersion)'
+    - script: |
+        python -m venv antenv
+        source antenv/bin/activate
+        python -m pip install --upgrade pip
+        pip install setup
+        pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
+      workingDirectory: $(projectRoot)
+      displayName: "Install requirements"
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(projectRoot)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        ArtifactName: 'drop'
 
-- deployment: DeploymentJob
-  dependsOn: BuildJob
+- stage: Development
+  displayName: 'Deploy to Development'
+  dependsOn: Build
   condition: succeeded()
-  pool:
-    vmImage: $(vmImageName)
-  environment: $(environmentName)
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - task: UsePythonVersion@0
-          inputs:
-            versionSpec: '$(pythonVersion)'
-          displayName: 'Use Python version'
-        - task: AzureWebApp@1
-          displayName: 'Deploy Azure Web App: python-flask-test2'
-          inputs:
-            azureSubscription: $(azureServiceConnectionId)
-            appName: $(webAppName)
-            package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+  jobs:
+  - deployment: DeploymentJob
+    pool:
+      vmImage: $(vmImageName)
+    environment: $(environmentName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python version'
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App: python-flask-test2'
+            inputs:
+              azureSubscription: $(azureServiceConnectionId)
+              appName: $(webAppName)
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
