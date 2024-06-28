@@ -3,4 +3,7 @@ gunicorn
 Werkzeug==2.2.2
 azure-identity
 azure-mgmt-compute
+azure-storage-blob
+azure-keyvault-secrets
+azure-mgmt-resource
 Flask-Cors
