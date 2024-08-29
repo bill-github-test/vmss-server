@@ -28,7 +28,7 @@ blob_service_client = BlobServiceClient(account_url=account_url, credential=cred
 container_client = blob_service_client.get_container_client("ssms-server")
 
 def log(message):
-    blob_client = container_client.get_blob_client(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}: ' +
+    blob_client = container_client.get_blob_client(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}: ' +
                                                    'Information')
     blob_client.upload_blob(message)
 
