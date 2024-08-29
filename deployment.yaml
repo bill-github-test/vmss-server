@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmss-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vmss-server
+  template:
+    metadata:
+      labels:
+        app: vmss-server
+    spec:
+      containers:
+      - name: vmss-server
+        image: BillTestContainerRegistry.azurecr.io/vmss-server:latest
+        ports:
+        - containerPort: 5000
