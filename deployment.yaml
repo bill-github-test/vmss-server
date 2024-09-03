@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: vmss-server
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: vmss-server
@@ -13,7 +13,7 @@ spec:
         app: vmss-server
     spec:
       containers:
-      - name: vmss-server
+      - name: vmss-server-container
         image: BillTestContainerRegistry.azurecr.io/vmss-server:latest
         ports:
         - containerPort: 5000
