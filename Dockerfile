@@ -11,7 +11,7 @@ ADD . /app
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Expose port 80
-EXPOSE 5000
+EXPOSE 50505
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app"]
